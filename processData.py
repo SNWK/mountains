@@ -3,7 +3,7 @@ from math import sqrt
 import random
 import numpy as np
 from scipy.spatial import cKDTree
-
+import sys
 # peakid latiCo LongiCo eleMeter Lati Longi ProMeter saddleId saddleLati longiLati isoKM
 # peakid latiCo LongiCo eleMeter Lati Longi ProMeter isoKM dom
 
@@ -165,7 +165,10 @@ def mergeIsolation(isoPath, promPath, outFile):
 
 
 if __name__ == "__main__":
-    name = "J42"
+    if len(sys.argv) < 3:
+        print("no name input")
+    
+    name = sys.argv[1]
     dvtPath = name + ".dvt"
     isoPath = name + "_iso.txt"
     proPath = name + "_pro.txt"

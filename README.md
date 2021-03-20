@@ -4,18 +4,25 @@ C++ programs for calculating the isolation and prominence from digital
 elevation data.
 
 ## How to run:
+Save *.hgt files in data/J42/.   
+
+Latitude: N36 - N39  
+
+Longitude: E66 - E71  
 
 ```
-code/debug/prominence 36 38 66 68 -i data/J42 -o output/J42 -f "SRTM"
+code/debug/prominence 36 40 66 72 -i data/J42 -o output/J42 -f "SRTM"
 
 code/debug/merge_divide_trees J42 output/J42/*tree.dvt -f 
 
-code/debug/isolation -i data/J42 -o output/J42 -- 36 38 66 68 
+code/debug/isolation -i data/J42 -o output/J42 -- 36 40 66 72
 
 cat output/J42/isolation*.txt > J42_iso.txt
 
-python processsData.py
+python processsData.py J42
 ```
+
+Note that the output coordinate has been normalized to square.
 
 
 ## Building the code
