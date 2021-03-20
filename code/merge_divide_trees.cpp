@@ -176,7 +176,7 @@ int main(int argc, char **argv) {
   prunedIslandTree->build();
   
   // Write final prominence value table
-  string filename = outputFilename + ".txt";
+  string filename = outputFilename + "_pro.txt";
   FILE *file = fopen(filename.c_str(), "wb");
   const CoordinateSystem &coords = divideTree->coordinateSystem();
   const vector<IslandTree::Node> &nodes = prunedIslandTree->nodes();
@@ -197,10 +197,15 @@ int main(int argc, char **argv) {
         elevation = -elevation;
       }
 
-      fprintf(file, "%.4f,%.4f,%d,%.4f,%.4f,%d\n",
-              peakpos.latitude(), peakpos.longitude(), elevation,
-              colpos.latitude(), colpos.longitude(),
-              nodes[i].prominence);
+      fprintf(file, "%d %.4f %.4f %d %d %d %.4f %.4f\n",
+              i, // peak id
+              peakpos.latitude(), 
+              peakpos.longitude(), 
+              int(0.3048*elevation), // feet to m
+              nodes[i].prominence,
+              nodes[i].keySaddleId,
+              colpos.latitude(), 
+              colpos.longitude());
     }
   }
   fclose(file);

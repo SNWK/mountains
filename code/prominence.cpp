@@ -194,6 +194,10 @@ int main(int argc, char **argv) {
       if (wrappedLng >= 180) {
         wrappedLng -= 360;
       }
+      int wrappedLat = lat;
+      if (wrappedLat >= 90) {
+        wrappedLat -= 180;
+      }
 
       // Skip tiles that don't intersect filtering polygon
       if (!filter.intersects(lat, lat + 1, lng, lng + 1)) {
@@ -211,7 +215,7 @@ int main(int argc, char **argv) {
       ProminenceTask *task = new ProminenceTask(cache, output_directory, bounds, minProminence);
       task->setAntiprominence(antiprominence);
       results.push_back(threadPool->enqueue([=] {
-            return task->run(lat, wrappedLng);
+            return task->run(wrappedLat, wrappedLng);
           }));
     }
   }

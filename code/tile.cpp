@@ -114,6 +114,7 @@ Tile *Tile::loadFromHgtFile(const string &directory, int minLat, int minLng) {
   FILE *infile = fopen(filename.c_str(), "rb");
   if (infile == nullptr) {
     VLOG(3) << "Failed to open file " << filename;
+    ELPP_COUT << "Failed to open file " << filename << "\n";
     return nullptr;
   }
   

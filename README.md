@@ -3,6 +3,21 @@
 C++ programs for calculating the isolation and prominence from digital
 elevation data.
 
+## How to run:
+
+```
+code/debug/prominence 36 38 66 68 -i data/J42 -o output/J42 -f "SRTM"
+
+code/debug/merge_divide_trees J42 output/J42/*tree.dvt -f 
+
+code/debug/isolation -i data/J42 -o output/J42 -- 36 38 66 68 
+
+cat output/J42/isolation*.txt > J42_iso.txt
+
+python processsData.py
+```
+
+
 ## Building the code
 
 C++11 support is required to build the code.  Binaries are placed in
