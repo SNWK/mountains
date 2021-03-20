@@ -24,6 +24,22 @@ python processsData.py J42
 
 Note that the output coordinate has been normalized to square.
 
+## Output file structure:
+J42.txt  
+
+```
+Peaks [peakNum]  
+[peakId] [latiCo] [LongiCo] [eleMeter] [Lati] [Longi] [ProMeter] [saddleId] [saddleLati] [longiLati] [isoKM]  
+...
+PromSaddles [saddleNum]  
+[saddleId] [latiCo] [LongiCo] [eleMeter]  
+...
+BasinSaddles 0
+Runoffs 0
+Edges [edgeNum]
+[edgeId] [edgeId] [saddleId]
+...
+```
 
 ## Building the code
 
