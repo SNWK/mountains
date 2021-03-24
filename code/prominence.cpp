@@ -52,7 +52,8 @@ using std::vector;
 
 INITIALIZE_EASYLOGGINGPP
 
-static void usage() {
+static void usage()
+{
   printf("Usage:\n");
   printf("  prominence min_lat max_lat min_lng max_lng\n");
   printf("  where coordinates are integer degrees\n");
@@ -69,36 +70,46 @@ static void usage() {
   exit(1);
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
   string terrain_directory(".");
   string output_directory(".");
   string peakbagger_filename;
   string polygonFilename;
 
-  float minProminence = 300;
+  float minProminence = 100;
   int numThreads = 1;
   FileFormat fileFormat = FileFormat::HGT;
-  
+
   // Parse options
   START_EASYLOGGINGPP(argc, argv);
   int ch;
   string str;
   bool antiprominence = false;
-  while ((ch = getopt(argc, argv, "af:i:k:m:o:p:t:")) != -1) {
-    switch (ch) {
+  while ((ch = getopt(argc, argv, "af:i:k:m:o:p:t:")) != -1)
+  {
+    switch (ch)
+    {
     case 'a':
       antiprominence = true;
       break;
-      
+
     case 'f':
       str = optarg;
-      if (str == "SRTM") {
+      if (str == "SRTM")
+      {
         fileFormat = FileFormat::HGT;
-      } else if (str == "NED1-ZIP") {
+      }
+      else if (str == "NED1-ZIP")
+      {
         fileFormat = FileFormat::NED1_ZIP;
-      } else if (str == "NED13-ZIP") {
+      }
+      else if (str == "NED13-ZIP")
+      {
         fileFormat = FileFormat::NED13_ZIP;
-      } else {
+      }
+      else
+      {
         printf("Unknown file format %s\n", optarg);
         usage();
       }
@@ -133,32 +144,38 @@ int main(int argc, char **argv) {
   argc -= optind;
   argv += optind;
 
-  if (argc < 4) {
+  if (argc < 4)
+  {
     usage();
   }
 
   // Load Peakbagger database?
   PeakbaggerCollection pb_collection;
   PointMap *peakbagger_peaks = new PointMap();
-  if (!peakbagger_filename.empty()) {
+  if (!peakbagger_filename.empty())
+  {
     printf("Loading peakbagger database\n");
-    if (!pb_collection.Load(peakbagger_filename)) {
+    if (!pb_collection.Load(peakbagger_filename))
+    {
       printf("Couldn't load peakbagger database from %s\n", peakbagger_filename.c_str());
       exit(1);
     }
 
     // Put Peakbagger peaks in spatial structure
     const vector<PeakbaggerPoint> &pb_peaks = pb_collection.points();
-    for (int i = 0; i < (int) pb_peaks.size(); ++i) {
+    for (int i = 0; i < (int)pb_peaks.size(); ++i)
+    {
       peakbagger_peaks->insert(&pb_peaks[i]);
     }
   }
-  
+
   float bounds[4];
-  for (int i = 0; i < 4; ++i) {
+  for (int i = 0; i < 4; ++i)
+  {
     char *endptr;
     bounds[i] = strtof(argv[i], &endptr);
-    if (*endptr != 0) {
+    if (*endptr != 0)
+    {
       printf("Couldn't parse argument %d as number: %s\n", i + 1, argv[i]);
       usage();
     }
@@ -166,9 +183,11 @@ int main(int argc, char **argv) {
 
   // Load filtering polygon
   Filter filter;
-  if (!polygonFilename.empty()) {
-    if (!filter.addPolygonsFromKml(polygonFilename)) {
-      printf("Couldn't load KML polygon from %s\n",polygonFilename.c_str());
+  if (!polygonFilename.empty())
+  {
+    if (!filter.addPolygonsFromKml(polygonFilename))
+    {
+      printf("Couldn't load KML polygon from %s\n", polygonFilename.c_str());
       exit(1);
     }
   }
@@ -178,36 +197,42 @@ int main(int argc, char **argv) {
   policy.enableNeighborEdgeLoading(true);
   const int CACHE_SIZE = 2;
   TileCache *cache = new TileCache(&policy, peakbagger_peaks, CACHE_SIZE);
-  
+
   set<Offsets::Value> tilesToSkip;
-  tilesToSkip.insert(Offsets(47, -87).value());  // in Lake Superior; lots of fake peaks
+  tilesToSkip.insert(Offsets(47, -87).value()); // in Lake Superior; lots of fake peaks
 
   VLOG(2) << "Using " << numThreads << " threads";
-  
+
   ThreadPool *threadPool = new ThreadPool(numThreads);
   int num_tiles_processed = 0;
   vector<std::future<bool>> results;
-  for (int lat = floor(bounds[0]); lat < ceil(bounds[1]); ++lat) {
-    for (int lng = floor(bounds[2]); lng < ceil(bounds[3]); ++lng) {
+  for (int lat = floor(bounds[0]); lat < ceil(bounds[1]); ++lat)
+  {
+    for (int lng = floor(bounds[2]); lng < ceil(bounds[3]); ++lng)
+    {
       // Allow specifying longitude ranges that span the antimeridian (lng > 180)
       int wrappedLng = lng;
-      if (wrappedLng >= 180) {
+      if (wrappedLng >= 180)
+      {
         wrappedLng -= 360;
       }
       int wrappedLat = lat;
-      if (wrappedLat >= 90) {
+      if (wrappedLat >= 90)
+      {
         wrappedLat -= 180;
       }
 
       // Skip tiles that don't intersect filtering polygon
-      if (!filter.intersects(lat, lat + 1, lng, lng + 1)) {
+      if (!filter.intersects(lat, lat + 1, lng, lng + 1))
+      {
         VLOG(3) << "Skipping tile that doesn't intersect polygon " << lat << " " << lng;
         continue;
       }
 
       // Skip some very slow tiles known to have no peaks
       Offsets coords(lat, lng);
-      if (tilesToSkip.find(coords.value()) != tilesToSkip.end()) {
+      if (tilesToSkip.find(coords.value()) != tilesToSkip.end())
+      {
         VLOG(1) << "Skipping slow tile " << lat << " " << lng;
         continue;
       }
@@ -215,17 +240,19 @@ int main(int argc, char **argv) {
       ProminenceTask *task = new ProminenceTask(cache, output_directory, bounds, minProminence);
       task->setAntiprominence(antiprominence);
       results.push_back(threadPool->enqueue([=] {
-            return task->run(wrappedLat, wrappedLng);
-          }));
+        return task->run(wrappedLat, wrappedLng);
+      }));
     }
   }
 
-  for (auto && result : results) {
-    if (result.get()) {
+  for (auto &&result : results)
+  {
+    if (result.get())
+    {
       num_tiles_processed += 1;
     }
   }
-    
+
   printf("Tiles processed = %d\n", num_tiles_processed);
 
   delete threadPool;

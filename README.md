@@ -4,35 +4,37 @@ C++ programs for calculating the isolation and prominence from digital
 elevation data.
 
 ## How to run:
-Save *.hgt files in data/J42/.   
 
-Latitude: N36 - N39  
+Save \*.hgt files in data/J42/.
 
-Longitude: E66 - E71  
+Latitude: N36 - N39
+
+Longitude: E66 - E71
 
 ```
 code/debug/prominence 36 40 66 72 -i data/J42 -o output/J42 -f "SRTM"
 
-code/debug/merge_divide_trees J42 output/J42/*tree.dvt -f 
+code/debug/merge_divide_trees J42 output/J42/*tree.dvt -f
 
 code/debug/isolation -i data/J42 -o output/J42 -- 36 40 66 72
 
 cat output/J42/isolation*.txt > J42_iso.txt
 
-python processsData.py J42
+python processData.py J42
 ```
 
 Note that the output coordinate has been normalized to square.
 
 ## Output file structure:
-J42.txt  
+
+J42.txt
 
 ```
-Peaks [peakNum]  
-[peakId] [latiCo] [LongiCo] [eleMeter] [Lati] [Longi] [ProMeter] [saddleId] [saddleLati] [longiLati] [isoKM]  
+Peaks [peakNum]
+[peakId] [latiCo] [LongiCo] [eleMeter] [Lati] [Longi] [ProMeter] [saddleId] [saddleLati] [longiLati] [isoKM]
 ...
-PromSaddles [saddleNum]  
-[saddleId] [latiCo] [LongiCo] [eleMeter]  
+PromSaddles [saddleNum]
+[saddleId] [latiCo] [LongiCo] [eleMeter]
 ...
 BasinSaddles 0
 Runoffs 0
@@ -43,7 +45,7 @@ Edges [edgeNum]
 
 ## Building the code
 
-C++11 support is required to build the code.  Binaries are placed in
+C++11 support is required to build the code. Binaries are placed in
 the "debug" or "release" subdirectories.
 
 ### OSX and gcc
@@ -51,7 +53,7 @@ the "debug" or "release" subdirectories.
 Debug version:
 
 ```
-make  
+make
 ```
 
 Release version:
@@ -105,7 +107,7 @@ Options:
 ```
 
 This will generate one output text file per input tile, containing the
-isolation of peaks in that tile.  The files can be merged and sorted
+isolation of peaks in that tile. The files can be merged and sorted
 with standard command-line utilities.
 
 ### Prominence
@@ -125,12 +127,12 @@ prominence -- <min latitude> <max latitude> <min longitude> <max longitude>
 ```
 
 This will produce divide trees with the .dvt extension, and KML files
-that can be viewed in Google Earth.  The unpruned trees are generally
-too large to be merged or to load into Earth.  Use the pruned versions
+that can be viewed in Google Earth. The unpruned trees are generally
+too large to be merged or to load into Earth. Use the pruned versions
 (identified by "pruned" in their filenames).
 
 Next, merge the resultant divide trees into a single, larger divide
-tree.  If there are thousands of input files, it will be much faster
+tree. If there are thousands of input files, it will be much faster
 to do this in multiple stages.
 
 ```
@@ -144,7 +146,7 @@ merge_divide_trees output_file_prefix input_file [...]
 ```
 
 The output is a dvt file with the merged divide tree, and a text file
-with prominence values.  If desired, the text file can be filtered to
+with prominence values. If desired, the text file can be filtered to
 exclude peaks outside of a polygon specified in KML, for example, to
 restrict the output to a single continent:
 
@@ -156,7 +158,6 @@ filter_points input_file polygon_file output_file
   -a longitude    Add 360 to any longitudes < this value in polygon.
                   Allows polygon to cross antimeridian (negative longitude gets +360)
 ```
-
 
 ## Results
 
@@ -177,8 +178,8 @@ A zip file with our prominence results for the world is [here](https://drive.goo
 ## Anti-prominence
 
 The "anti-prominence" of low points can be computed by the same algorithm, simply by changing
-the sign of the elevation values.  This can be done by giving the -a option to the 
-"prominence" command.  Then, at the final stage of merging (with the -f flag), add the -a option 
+the sign of the elevation values. This can be done by giving the -a option to the
+"prominence" command. Then, at the final stage of merging (with the -f flag), add the -a option
 again to flip the elevation values back to positive.
 
 ## More information
@@ -189,5 +190,5 @@ http://andrewkirmse.com/prominence, including nice visualizations.
 
 This work was later published in the October, 2017 issue of the
 journal "Progress of Physical Geography"
-[here](https://doi.org/10.1177/0309133317738163).  The article can be
+[here](https://doi.org/10.1177/0309133317738163). The article can be
 read [here](http://www.andrewkirmse.com/prominence-article).
